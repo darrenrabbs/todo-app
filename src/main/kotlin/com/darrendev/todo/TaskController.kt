@@ -2,6 +2,7 @@ package com.darrendev.todo
 
 import org.springframework.web.bind.annotation.*
 import org.springframework.http.ResponseEntity
+import java.util.*
 
 
 @RestController
@@ -11,6 +12,11 @@ class TaskController(val service: TaskService) {
 
     @GetMapping
     fun tasks() = ResponseEntity.ok(service.getAll())
+
+    @GetMapping("/{id}")
+    fun tasks(@PathVariable id: Long): ResponseEntity<Optional<Task>> {
+        return ResponseEntity.ok(service.get(id))
+    }
 
     @PostMapping
     fun create(@RequestBody task: Task): ResponseEntity<String> {

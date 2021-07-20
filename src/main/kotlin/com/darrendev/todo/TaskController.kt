@@ -1,9 +1,13 @@
 package com.darrendev.todo
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import org.springframework.http.ResponseEntity
 import java.util.*
 
+val mapper = ObjectMapper().registerModule(KotlinModule())
 
 @RestController
 @RequestMapping("/task")
@@ -18,12 +22,20 @@ class TaskController(val service: TaskService) {
         return ResponseEntity.ok(service.get(id))
     }
 
-    @PostMapping
+    @PostMapping()
     fun create(@RequestBody task: Task): ResponseEntity<String> {
         val result = service.save(task)
+        return ResponseEntity.ok(mapper.writeValueAsString(result))
+    }
 
-        return ResponseEntity.ok(
-                "added task with description ${result.description}")
+    @PutMapping("/{id}")
+    fun update(@PathVariable id: Long, @RequestBody task: Task): ResponseEntity<String> {
+        var t : Task = service.get(id).get()
+        if (task.description != null) {
+            t.description = task.description
+        }
+        val result = service.save(t)
+        return ResponseEntity.ok(mapper.writeValueAsString(result))
     }
 
     @DeleteMapping("/{id}")
